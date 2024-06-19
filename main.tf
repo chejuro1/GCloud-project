@@ -1,3 +1,9 @@
+terraform {
+  backend "gcs" {
+    bucket  = "mystatefile"
+    prefix  = "terraform/state"
+  }
+}
 provider "google" {
   credentials = file(var.credentials_file_path)
   project     = var.project_id
@@ -7,7 +13,7 @@ provider "google" {
 resource "google_compute_instance" "default" {
   name         = "terraform-instance"
   machine_type = "f1-micro"
-  zone         = "us-central1-a"
+  zone         = "northamerica-northeast2-a"
 
   boot_disk {
     initialize_params {
@@ -26,7 +32,7 @@ variable "credentials_file_path" {
 }
 
 variable "project_id" {
-  description = "Google Cloud project ID"
+  description = "project description in google"
 }
 
 variable "region" {
