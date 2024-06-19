@@ -1,0 +1,35 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  TF_VAR_project_id: 'azure'
+  TF_VAR_region: 'northamerica-northeast2'
+  TF_VAR_credentials_file_path: '$(System.DefaultWorkingDirectory)/gcloud.json'
+
+steps:
+- task: UseTerraform@0
+  inputs:
+    version: 'latest'
+
+- task: DownloadSecureFile@1
+  name: downloadGCPKey
+  inputs:
+    secureFile: 'gcloud.json'
+
+- script: |
+    mv $(downloadGCPKey.secureFilePath) gcloud-key.json
+  displayName: 'Move GCP credentials file'
+
+- script: |
+    terraform init
+    terraform plan
+  workingDirectory: $(System.DefaultWorkingDirectory)
+  displayName: 'Terraform Init and Plan'
+
+- script: |
+    terraform apply -auto-approve
+  workingDirectory: $(System.DefaultWorkingDirectory)
+  displayName: 'Terraform Apply'
